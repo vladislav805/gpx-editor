@@ -6,12 +6,13 @@ import Button from '../Button';
 import { browseFile, readFileAsText } from '../../utils';
 import GPXManager from '../../manager/gpx';
 import * as Leaflet from 'leaflet';
+import * as L from 'leaflet';
 import { LatLngLiteral, LatLngTuple, Marker as LMarker } from 'leaflet';
 import { List } from '../List';
 import WaypointEditModal from '../WaypointEditModal';
 import Checkbox from '../Checkbox';
 import { markerBlue, markerRed } from '../MapMarker';
-import * as L from 'leaflet';
+import TextInput, { TextInputType } from '../TextInput';
 
 type IAppProps = unknown;
 
@@ -20,6 +21,7 @@ interface IAppState {
     editing?: IWayPoint;
     showRouteLine: boolean;
     hoverPointId?: number;
+    trackName?: string;
 }
 
 export default class App extends React.Component<IAppProps, IAppState> {
@@ -104,7 +106,12 @@ export default class App extends React.Component<IAppProps, IAppState> {
         if (delta < 100 && this.lastMouseDown.latlng.lat === e.latlng.lat && this.lastMouseDown.latlng.lng === e.latlng.lng) {
             this.onMapClick(this.lastMouseDown.latlng);
         }
-    }
+    };
+
+    private onChangeTrackName = (name: string, value: string) => {
+        this.setState({ trackName: value });
+        this.state.manager.setTitle(value);
+    };
 
     render() {
         const { manager, showRouteLine, hoverPointId } = this.state;
@@ -112,20 +119,29 @@ export default class App extends React.Component<IAppProps, IAppState> {
         return (
             <div className="app">
                 <div className="app-menu">
-                    <Button
-                        label="Open GPX"
-                        onClick={this.onClickOpen} />
-                    <Button
-                        label="Save GPX"
-                        onClick={this.onClickSave} />
-                    <Checkbox
-                        name="show_line"
-                        label="Show route line"
-                        onSetChecked={this.onShowLineChange} />
+                    <div className="app-menu--actions">
+                        <Button
+                            label="Open GPX"
+                            onClick={this.onClickOpen} />
+                        <Button
+                            label="Save GPX"
+                            onClick={this.onClickSave} />
+                        <TextInput
+                            type={TextInputType.text}
+                            label="Name"
+                            value='track' // todo
+                            onChange={this.onChangeTrackName} />
+                    </div>
+                    <div className="app-menu--options">
+                        <Checkbox
+                            name="show_line"
+                            label="Show route line"
+                            onSetChecked={this.onShowLineChange} />
+                    </div>
                 </div>
                 <Map
-                    center={[60, 30.3]}
-                    zoom={13}
+                    center={[59.95, 30.35]}
+                    zoom={11}
                     className="app-map"
                     onmousedown={this.onMouseDown}
                     onmouseup={this.onMouseUp}>

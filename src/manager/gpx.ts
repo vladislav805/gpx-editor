@@ -19,9 +19,11 @@ export default class GPXManager extends Manager implements IManager {
             gpx: {
                 time: '',
                 metadata: {
-                    name: '',
+                    name: 'track',
                     desc: '',
-                    author: [],
+                    author: [{
+                        name: 'GPX editor by Vladislav Veluga',
+                    }],
                 },
                 wpt: [],
             },
@@ -73,7 +75,12 @@ export default class GPXManager extends Manager implements IManager {
         const xml = doc.end({ prettyPrint: false });
         const blob = new Blob([xml], { type: 'application/gpx+xml' });
 
-        saveAs(blob, 'track.gpx');
+        saveAs(blob, `${this.root.metadata.name}.gpx`);
+    }
+
+    public setTitle(title: string) {
+        this.root.metadata.name = title;
+        return this;
     }
 
 }

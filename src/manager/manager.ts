@@ -6,6 +6,7 @@ export interface IManager {
     remove(point: IWayPoint): this;
     save(): void;
     getItems(): IWayPoint[];
+    setTitle(title: string): this;
 }
 
 export interface IWayPoint extends IPoint {
@@ -64,5 +65,10 @@ export default abstract class Manager implements IManager {
 
     public getItems() {
         return this.waypoints;
+    }
+
+    // eslint-disable-next-line
+    public setTitle(title: string) {
+        return this;
     }
 }
