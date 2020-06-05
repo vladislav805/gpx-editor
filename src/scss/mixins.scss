@@ -1,0 +1,18 @@
+@import './colors.scss';
+@import './sizes.scss';
+
+@mixin size($width, $height: $width) {
+    width: $width;
+    height: $height;
+}
+
+@mixin flex($direction, $wrap: nowrap) {
+    display: flex;
+    flex-flow: $direction $wrap;
+}
+
+@mixin flex-center {
+    @include flex(row);
+    justify-content: center;
+    align-items: center;
+}

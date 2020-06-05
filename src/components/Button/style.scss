@@ -1,0 +1,100 @@
+@import '../../inc.scss';
+
+@function compute-padding($height, $line-height) {
+    @return ($height - $line-height) / 2;
+}
+
+@mixin button-size($height, $line-height) {
+    min-height: $height;
+    line-height: $line-height;
+    padding: compute-padding($height, $line-height) 10px;
+}
+
+.xButton {
+    $default-size: 32px;
+    $animation-duration: .1s;
+    $lh: 16px;
+
+    $button-sizes: (
+        s: 24px,
+        m: $default-size,
+        l: 38px
+    );
+
+    margin: 4px 0;
+    padding: 0 10px;
+
+    border: none;
+    outline: none;
+
+    @include button-size($default-size, $lh);
+
+    background: $color-secondary-bg;
+    color: $color-secondary-fg;
+
+    display: inline-flex;
+    flex-flow: row nowrap;
+    align-items: center;
+
+    transition:
+        color $animation-duration linear,
+        background $animation-duration linear;
+
+    @each $code, $height in $button-sizes {
+
+        &__size-#{$code} {
+            @include button-size($height, $lh);
+        }
+    }
+
+    // TODO
+    $type: (
+        ('primary', $color-primary-bg, #ffffff),
+        ('secondary', $color-secondary-bg, #000000),
+    );
+
+    @each $name, $bg, $fg in $type {
+        &__#{$name} {
+            background: $bg;
+            color: $fg;
+        }
+
+        &__#{$name}:disabled {
+            background: transparentize($color: $bg, $amount: .15);
+            color: transparentize($color: $fg, $amount: .2);
+        }
+    }
+
+    &__transparent {
+        background: transparent;
+        color: inherit;
+    }
+
+    &__withIcon-label {
+        margin-left: 6px;
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+    }
+
+    // Loading spinner
+    &::after {
+        content: '';
+        display: block;
+        position: absolute;
+        top: calc(50% - 6px);
+        left: calc(50% - 6px);
+        transition: opacity $animation-duration linear;
+        opacity: 0;
+        box-sizing: border-box;
+    }
+
+    & + & {
+        margin-left: 3px;
+    }
+}
+
+a.xButton {
+    display: inline-block;
+}

@@ -1,0 +1,17 @@
+.waypoint-item {
+    padding: 10px 14px;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+
+    &--info {
+        flex-grow: 1;
+        min-width: 0;
+    }
+
+    &--actions {
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: center;
+    }
+}

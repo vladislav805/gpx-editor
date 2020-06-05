@@ -1,0 +1,57 @@
+@import './mixins.scss';
+@import './sizes.scss';
+@import './colors.scss';
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+*,
+*::after,
+*::before {
+    box-sizing: border-box;
+}
+
+body {
+    font: {
+        family: "Roboto", "Open Sans", "Helvetica Neue", sans-serif;
+        size: 14px;
+    }
+
+    background: var(--color-body);
+}
+
+html,
+body,
+#root {
+    height: 100%;
+}
+
+h1,
+h2,
+h3,
+h4 {
+    margin: 4px 0;
+}
+
+@mixin header($tfz, $dfz, $lh) {
+    font-size: $tfz;
+    line-height: $lh;
+}
+
+h1 {
+    @include header(16px, 24px, 1.4);
+}
+
+h2 {
+    @include header(14px, 20px, 1.2);
+}
+
+h3 {
+    @include header(12px, 18px, 1.2);
+}
+
+h4 {
+    @include header(11px, 14px, 1.2);
+}
