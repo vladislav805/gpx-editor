@@ -7,6 +7,7 @@ import Button from '../Button';
 interface IWaypointEditModalProps {
     waypoint?: IWayPoint;
     onDone: (waypoint: IWayPoint) => void;
+    onCancel: () => void;
 }
 
 interface IWaypointEditModalState {
@@ -26,7 +27,7 @@ export default class WaypointEditModal extends React.Component<IWaypointEditModa
     }
 
     componentWillUnmount() {
-        this.setState({ title: '', description: '' });
+        this.setState({ title: '', description: '', show: false });
     }
 
     private onChangeText = (name: string, value: string) => {
@@ -46,7 +47,7 @@ export default class WaypointEditModal extends React.Component<IWaypointEditModa
         this.props.onDone(point);
     };
 
-    private cancel = () => this.setState({ show: false });
+    private cancel = () => this.setState({ show: false }, this.props.onCancel);
 
     render() {
         const { waypoint } = this.props;

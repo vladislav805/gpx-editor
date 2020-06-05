@@ -5,7 +5,6 @@ import Button from '../Button';
 
 interface IWaypointItemProps {
     waypoint: IWayPoint;
-    onUpdateWaypoint: (point: IWayPoint) => void;
     onRemoveWaypoint: (point: IWayPoint) => void;
     onRequestEditWaypoint: (point: IWayPoint) => void;
 }
@@ -15,14 +14,9 @@ interface IWaypointItemState {
 }
 
 export default class WaypointItem extends React.Component<IWaypointItemProps, IWaypointItemState> {
+    private onEdit = () => this.props.onRequestEditWaypoint(this.props.waypoint);
 
-    private onEdit = () => {
-        this.props.onRequestEditWaypoint(this.props.waypoint);
-    };
-
-    private onRemove = () => {
-        this.props.onRemoveWaypoint(this.props.waypoint);
-    };
+    private onRemove = () => this.props.onRemoveWaypoint(this.props.waypoint);
 
     render() {
         const { waypoint } = this.props;

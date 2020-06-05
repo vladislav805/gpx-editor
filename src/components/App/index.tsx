@@ -1,20 +1,22 @@
 import * as React from 'react';
 import './App.scss';
-import { Map, Marker, TileLayer } from 'react-leaflet';
+import { Map, Marker, Polyline, TileLayer } from 'react-leaflet';
 import { IManager, IWayPoint } from '../../manager/manager';
 import Button from '../Button';
 import { browseFile, readFileAsText } from '../../utils';
 import GPXManager from '../../manager/gpx';
 import * as Leaflet from 'leaflet';
-import { Marker as LMarker } from 'leaflet';
+import { LatLngTuple, Marker as LMarker } from 'leaflet';
 import { List } from '../List';
 import WaypointEditModal from '../WaypointEditModal';
+import Checkbox from '../Checkbox';
 
 type IAppProps = unknown;
 
 interface IAppState {
     manager: IManager;
     editing?: IWayPoint;
+    showRouteLine: boolean;
 }
 
 export default class App extends React.Component<IAppProps, IAppState> {
@@ -25,6 +27,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
 
         this.state = {
             manager: GPXManager.empty(),
+            showRouteLine: false,
         };
     }
 
@@ -52,9 +55,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
         }));
     };
 
-    private onRequestEditWaypoint = (point: IWayPoint) => this.setState({
-        editing: point,
-    });
+    private onRequestEditWaypoint = (point: IWayPoint) => this.setState({ editing: point });
 
     private onUpdateWaypoint = (point: IWayPoint) => {
         this.setState(({ manager }) => ({ manager: manager.edit(point) }));
@@ -76,8 +77,21 @@ export default class App extends React.Component<IAppProps, IAppState> {
         this.onRequestEditWaypoint(null);
     };
 
+    private onEditCancel = () => {
+        this.onRequestEditWaypoint(null);
+    };
+
+    private onSortUpdate = () => {
+        this.setState(({ manager }) => ({ manager }));
+    };
+
+    private onShowLineChange = () => this.setState(({ showRouteLine }) => ({
+        showRouteLine: !showRouteLine,
+    }));
+
     render() {
-        const { manager } = this.state;
+        const { manager, showRouteLine } = this.state;
+
         return (
             <div className="app">
                 <div className="app-menu">
@@ -87,6 +101,10 @@ export default class App extends React.Component<IAppProps, IAppState> {
                     <Button
                         label="Save GPX"
                         onClick={this.onClickSave} />
+                    <Checkbox
+                        name="show_line"
+                        label="Show route line"
+                        onSetChecked={this.onShowLineChange} />
                 </div>
                 <Map
                     center={[60, 30.3]}
@@ -103,14 +121,19 @@ export default class App extends React.Component<IAppProps, IAppState> {
                             draggable
                             ondragend={e => this.onDragPointEnd(e, point)} />
                     ))}
+                    {showRouteLine && manager?.getItems().length > 0 && (
+                        <Polyline
+                            positions={manager?.getItems().map(({ lat, lng }) => [lat, lng] as LatLngTuple)} />
+                    )}
                 </Map>
                 <List
                     items={manager?.getItems() ?? []}
                     onRequestEditWaypoint={this.onRequestEditWaypoint}
-                    onUpdateWaypoint={this.onUpdateWaypoint}
-                    onRemoveWaypoint={this.onRemoveWaypoint} />
+                    onRemoveWaypoint={this.onRemoveWaypoint}
+                    onSortUpdate={this.onSortUpdate} />
                 <WaypointEditModal
                     onDone={this.onEditedDone}
+                    onCancel={this.onEditCancel}
                     waypoint={this.state.editing} />
             </div>
         );

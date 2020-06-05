@@ -1,0 +1,22 @@
+li {
+    list-style: none;
+}
+
+.sortable {
+    &-item {
+        display: flex;
+        flex-flow: row nowrap;
+
+        & > :last-child {
+            flex-grow: 1;
+            min-width: 0;
+        }
+    }
+
+    &-handle {
+        padding: 5px 8px;
+        cursor: ns-resize;
+        user-select: none;
+        line-height: 40px;
+    }
+}
