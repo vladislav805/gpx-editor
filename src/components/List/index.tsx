@@ -12,6 +12,7 @@ import { swapItems } from '../../utils';
 type WaypointCallbacks = {
     onRemoveWaypoint: (point: IWayPoint) => void;
     onRequestEditWaypoint: (point: IWayPoint) => void;
+    onHighlightUpdate: (pointId: number) => void;
 };
 
 interface IListProps extends WaypointCallbacks {
@@ -27,12 +28,14 @@ const DragHandle = SortableHandle(() => <div className="sortable-handle">::</div
 
 const SortableItem = SortableElement(({ point, pr }: { point: IWayPoint, pr: WaypointCallbacks }) => (
     <li className="sortable-item">
-        <DragHandle />
         <WaypointItem
             key={point.id}
             waypoint={point}
             onRequestEditWaypoint={pr.onRequestEditWaypoint}
-            onRemoveWaypoint={pr.onRemoveWaypoint} />
+            onRemoveWaypoint={pr.onRemoveWaypoint}
+            onHighlightUpdate={pr.onHighlightUpdate}>
+            <DragHandle />
+        </WaypointItem>
     </li>
 ));
 
@@ -57,9 +60,9 @@ export class List extends React.Component<IListProps, IListState> {
     };
 
     render() {
-        const { items, onRemoveWaypoint, onRequestEditWaypoint } = this.props;
+        const { items, onRemoveWaypoint, onRequestEditWaypoint, onHighlightUpdate } = this.props;
 
-        const pr: WaypointCallbacks = { onRemoveWaypoint, onRequestEditWaypoint };
+        const pr: WaypointCallbacks = { onRemoveWaypoint, onRequestEditWaypoint, onHighlightUpdate };
         return (
             <div className="app-list">
                 <SortableList

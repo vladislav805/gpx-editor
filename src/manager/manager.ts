@@ -30,6 +30,11 @@ export default abstract class Manager implements IManager {
 
     public add(point: IWayPoint) {
         point.id = ++this.curId;
+
+        if (!point.title) {
+            point.title = `Waypoint #${point.id}`;
+        }
+
         this.waypoints.push(point);
         return this;
     }

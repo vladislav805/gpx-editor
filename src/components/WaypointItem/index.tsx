@@ -7,6 +7,7 @@ interface IWaypointItemProps {
     waypoint: IWayPoint;
     onRemoveWaypoint: (point: IWayPoint) => void;
     onRequestEditWaypoint: (point: IWayPoint) => void;
+    onHighlightUpdate: (pointId: number) => void;
 }
 
 interface IWaypointItemState {
@@ -18,10 +19,15 @@ export default class WaypointItem extends React.Component<IWaypointItemProps, IW
 
     private onRemove = () => this.props.onRemoveWaypoint(this.props.waypoint);
 
+    private onMouseEnter = () => this.props.onHighlightUpdate(this.props.waypoint.id);
+
+    private onMouseLeave = () => this.props.onHighlightUpdate(0);
+
     render() {
         const { waypoint } = this.props;
         return (
-            <div className="waypoint-item" key={waypoint.id}>
+            <div className="waypoint-item" onMouseEnter={this.onMouseEnter} onMouseLeave={this.onMouseLeave}>
+                {this.props.children}
                 <div className="waypoint-item--info">
                     <h3>{waypoint.title}</h3>
                     <p>{waypoint.description}</p>

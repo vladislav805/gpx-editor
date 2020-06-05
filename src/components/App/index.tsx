@@ -6,10 +6,12 @@ import Button from '../Button';
 import { browseFile, readFileAsText } from '../../utils';
 import GPXManager from '../../manager/gpx';
 import * as Leaflet from 'leaflet';
-import { LatLngTuple, Marker as LMarker } from 'leaflet';
+import { LatLngLiteral, LatLngTuple, Marker as LMarker } from 'leaflet';
 import { List } from '../List';
 import WaypointEditModal from '../WaypointEditModal';
 import Checkbox from '../Checkbox';
+import { markerBlue, markerRed } from '../MapMarker';
+import * as L from 'leaflet';
 
 type IAppProps = unknown;
 
@@ -17,6 +19,7 @@ interface IAppState {
     manager: IManager;
     editing?: IWayPoint;
     showRouteLine: boolean;
+    hoverPointId?: number;
 }
 
 export default class App extends React.Component<IAppProps, IAppState> {
@@ -31,7 +34,6 @@ export default class App extends React.Component<IAppProps, IAppState> {
         };
     }
 
-
     private onClickOpen = () => {
         browseFile()
             .then(readFileAsText)
@@ -43,13 +45,13 @@ export default class App extends React.Component<IAppProps, IAppState> {
         this.state.manager.save();
     };
 
-    private onMapClick = (event: Leaflet.LeafletMouseEvent) => {
-        const { lat, lng } = event.latlng;
+    private onMapClick = (pos: LatLngLiteral) => {
+        const { lat, lng } = pos;
         this.setState(({ manager }) => ({
             manager: manager.add({
                 lat,
                 lng,
-                title: 'New waypoint',
+                title: undefined,
                 description: undefined,
             }),
         }));
@@ -85,12 +87,27 @@ export default class App extends React.Component<IAppProps, IAppState> {
         this.setState(({ manager }) => ({ manager }));
     };
 
+    private onHighlightUpdate = (pointId: number) => this.setState({ hoverPointId: pointId });
+
     private onShowLineChange = () => this.setState(({ showRouteLine }) => ({
         showRouteLine: !showRouteLine,
     }));
 
+    private lastMouseDown: L.LeafletMouseEvent;
+    private onMouseDown = (e: L.LeafletMouseEvent) => {
+        this.lastMouseDown = e;
+    };
+
+    private onMouseUp = (e: L.LeafletMouseEvent) => {
+        const delta = this.lastMouseDown.originalEvent.timeStamp - e.originalEvent.timeStamp;
+
+        if (delta < 100 && this.lastMouseDown.latlng.lat === e.latlng.lat && this.lastMouseDown.latlng.lng === e.latlng.lng) {
+            this.onMapClick(this.lastMouseDown.latlng);
+        }
+    }
+
     render() {
-        const { manager, showRouteLine } = this.state;
+        const { manager, showRouteLine, hoverPointId } = this.state;
 
         return (
             <div className="app">
@@ -110,7 +127,8 @@ export default class App extends React.Component<IAppProps, IAppState> {
                     center={[60, 30.3]}
                     zoom={13}
                     className="app-map"
-                    onclick={this.onMapClick}>
+                    onmousedown={this.onMouseDown}
+                    onmouseup={this.onMouseUp}>
                     <TileLayer
                         attribution="&copy; <a href='http://osm.org/copyright'>OpenStreetMap</a> contributors"
                         url="https://tile.openstreetmap.org/{z}/{x}/{y}.png" />
@@ -119,7 +137,10 @@ export default class App extends React.Component<IAppProps, IAppState> {
                             key={point.id}
                             position={[point.lat, point.lng]}
                             draggable
-                            ondragend={e => this.onDragPointEnd(e, point)} />
+                            onclick={e => L.DomEvent.stopPropagation(e)}
+                            ondragend={e => this.onDragPointEnd(e, point)}
+                            icon={point.id === hoverPointId ? markerRed() : markerBlue()}
+                            title={point.title} />
                     ))}
                     {showRouteLine && manager?.getItems().length > 0 && (
                         <Polyline
@@ -130,7 +151,8 @@ export default class App extends React.Component<IAppProps, IAppState> {
                     items={manager?.getItems() ?? []}
                     onRequestEditWaypoint={this.onRequestEditWaypoint}
                     onRemoveWaypoint={this.onRemoveWaypoint}
-                    onSortUpdate={this.onSortUpdate} />
+                    onSortUpdate={this.onSortUpdate}
+                    onHighlightUpdate={this.onHighlightUpdate} />
                 <WaypointEditModal
                     onDone={this.onEditedDone}
                     onCancel={this.onEditCancel}
