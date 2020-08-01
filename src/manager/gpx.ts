@@ -83,6 +83,10 @@ export default class GPXManager extends Manager implements IManager {
         return this;
     }
 
+    public getTitle(): string {
+        return this.root.metadata.name;
+    }
+
 }
 
 export interface IGPXFile {

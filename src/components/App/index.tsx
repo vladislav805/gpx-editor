@@ -40,7 +40,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
         browseFile()
             .then(readFileAsText)
             .then(xmlString => GPXManager.open(xmlString))
-            .then(manager => this.setState({ manager }));
+            .then(manager => this.setState({ manager, trackName: manager.getTitle() }));
     };
 
     private onClickSave = () => {
@@ -147,7 +147,9 @@ export default class App extends React.Component<IAppProps, IAppState> {
                     onmouseup={this.onMouseUp}>
                     <TileLayer
                         attribution="&copy; <a href='http://osm.org/copyright'>OpenStreetMap</a> contributors"
-                        url="https://tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        subdomains={['a', 'b', 'c']}
+                        maxZoom={19} />
                     {manager?.getItems().map(point => (
                         <Marker
                             key={point.id}

@@ -7,6 +7,7 @@ export interface IManager {
     save(): void;
     getItems(): IWayPoint[];
     setTitle(title: string): this;
+    getTitle(): string;
 }
 
 export interface IWayPoint extends IPoint {
@@ -71,4 +72,6 @@ export default abstract class Manager implements IManager {
     public setTitle(title: string) {
         return this;
     }
+
+    public abstract getTitle(): string;
 }
